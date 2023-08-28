@@ -41,11 +41,18 @@ function ssh(config) {
         writeBundle(options) {
             return __awaiter(this, void 0, void 0, function* () {
                 const localPath = normalizeOutDir(options);
-                yield conn_server(ssh, host, username, password);
-                yield clean_dir(ssh, remotePath);
-                yield upload_dir(ssh, localPath, remotePath);
-                console.log('\x1b[1m\x1b[36m%s\x1b[0m', 'ssh upload successfully √ (rollup-simple-ssh)');
-                ssh.dispose();
+                try {
+                    yield conn_server(ssh, host, username, password);
+                    yield clean_dir(ssh, remotePath);
+                    yield upload_dir(ssh, localPath, remotePath);
+                    console.log('\x1b[1m\x1b[36m%s\x1b[0m', 'ssh upload successfully √ (rollup-simple-ssh)');
+                }
+                catch (error) {
+                    console.log('\x1b[1m\x1b[31m', 'something went wrong (rollup-simple-ssh)', '\x1b[0m');
+                }
+                finally {
+                    ssh.dispose();
+                }
             });
         }
     };
@@ -69,7 +76,8 @@ function conn_server(ssh, host, username, password) {
             });
         }
         catch (error) {
-            console.log(error, 'connect server error');
+            errorLog('connect server error');
+            throw error;
         }
     });
 }
@@ -80,7 +88,8 @@ function clean_dir(ssh, remotePath) {
             yield ssh.execCommand(command);
         }
         catch (error) {
-            console.log(error, 'remove previous dir error');
+            errorLog('remove previous dir error');
+            throw error;
         }
     });
 }
@@ -90,9 +99,13 @@ function upload_dir(ssh, localPath, remotePath) {
             yield ssh.putDirectory(localPath, remotePath);
         }
         catch (error) {
-            console.log('upload static source error');
+            errorLog('upload static source error');
+            throw error;
         }
     });
+}
+function errorLog(msg) {
+    console.log('\x1b[1m\x1b[31m', msg + '(rollup-simple-ssh)', '\x1b[0m');
 }
 
 export { ssh as default };

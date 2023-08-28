@@ -18,11 +18,16 @@ function ssh(config: ServerConfig): Plugin {
     name: 'rollup-simple-ssh',
     async writeBundle(options) {
       const localPath = normalizeOutDir(options)
-      await conn_server(ssh, host, username, password)
-      await clean_dir(ssh, remotePath)
-      await upload_dir(ssh, localPath, remotePath)
-      console.log('\x1b[1m\x1b[36m%s\x1b[0m', 'ssh upload successfully √ (rollup-simple-ssh)');
-      ssh.dispose()
+      try {
+        await conn_server(ssh, host, username, password)
+        await clean_dir(ssh, remotePath)
+        await upload_dir(ssh, localPath, remotePath)
+        console.log('\x1b[1m\x1b[36m%s\x1b[0m', 'ssh upload successfully √ (rollup-simple-ssh)');
+      } catch (error) {
+        console.log('\x1b[1m\x1b[31m', 'something went wrong (rollup-simple-ssh)', '\x1b[0m');
+      } finally {
+        ssh.dispose()
+      }
     }
   }
 }
@@ -50,7 +55,8 @@ async function conn_server(
       password
     })
   } catch (error) {
-    console.log(error, 'connect server error');
+    errorLog('connect server error');
+    throw error;
   }
 }
 
@@ -59,7 +65,8 @@ async function clean_dir(ssh: NodeSSH, remotePath: ServerConfig['remotePath']) {
   try {
     await ssh.execCommand(command)
   } catch (error) {
-    console.log(error, 'remove previous dir error');
+    errorLog('remove previous dir error')
+    throw error;
   }
 }
 
@@ -67,8 +74,13 @@ async function upload_dir(ssh: NodeSSH, localPath: string, remotePath: ServerCon
   try {
     await ssh.putDirectory(localPath, remotePath)
   } catch (error) {
-    console.log('upload static source error');
+    errorLog('upload static source error')
+    throw error;
   }
+}
+
+function errorLog(msg: string) {
+  console.log('\x1b[1m\x1b[31m', msg + '(rollup-simple-ssh)', '\x1b[0m');
 }
 
 export default ssh
