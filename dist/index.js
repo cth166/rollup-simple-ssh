@@ -37,14 +37,14 @@ function ssh(config) {
     const ssh = new NodeSSH();
     const { host, username, password, remotePath } = config;
     return {
-        name: 'rollup-plugin-ssh',
+        name: 'rollup-simple-ssh',
         writeBundle(options) {
             return __awaiter(this, void 0, void 0, function* () {
                 const localPath = normalizeOutDir(options);
                 yield conn_server(ssh, host, username, password);
                 yield clean_dir(ssh, remotePath);
                 yield upload_dir(ssh, localPath, remotePath);
-                console.log('\x1b[1m\x1b[36m%s\x1b[0m', 'ssh upload successfully √');
+                console.log('\x1b[1m\x1b[36m%s\x1b[0m', 'ssh upload successfully √ (rollup-simple-ssh)');
                 ssh.dispose();
             });
         }
