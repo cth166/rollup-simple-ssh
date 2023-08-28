@@ -15,13 +15,13 @@ function ssh(config: ServerConfig): Plugin {
   const { host, username, password, remotePath } = config
 
   return {
-    name: 'rollup-plugin-ssh',
+    name: 'rollup-simple-ssh',
     async writeBundle(options) {
       const localPath = normalizeOutDir(options)
       await conn_server(ssh, host, username, password)
       await clean_dir(ssh, remotePath)
       await upload_dir(ssh, localPath, remotePath)
-      console.log('\x1b[1m\x1b[36m%s\x1b[0m', 'ssh upload successfully √');
+      console.log('\x1b[1m\x1b[36m%s\x1b[0m', 'ssh upload successfully √ (rollup-simple-ssh)');
       ssh.dispose()
     }
   }
