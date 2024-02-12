@@ -1,9 +1,16 @@
 import type { Plugin } from 'rollup';
-interface ServerConfig {
-    host: string;
-    username: string;
-    password: string;
+import type { Config } from 'node-ssh';
+interface BaseConfig {
+    host: Config['host'];
+    username: Config['username'];
     remotePath: string;
 }
-declare function ssh(config: ServerConfig): Plugin;
+type PasswordConfig = BaseConfig & {
+    password: Config['password'];
+};
+type KeyConfig = BaseConfig & {
+    privateKeyPath: Config['privateKeyPath'];
+};
+type SSHConfig = PasswordConfig | KeyConfig;
+declare function ssh(config: SSHConfig): Plugin;
 export default ssh;

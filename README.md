@@ -27,7 +27,8 @@ export default defineConfig({
     ssh({
       host: "192.168.117.133",
       username: "cth",
-      password: "123456",
+      // password: "123456",
+      privateKeyPath: String.raw`C:\Users\cth16\.ssh\id_ubuntu`,
       remotePath: "/home/cth/Desktop/build",
     }),
   ],
@@ -36,19 +37,15 @@ export default defineConfig({
 
 ## Options
 
-This plugin currently only supports password and does not support authorized_keys.
-
-There are currently no plans to support that feature.
-
 ### `host`
 
 your server ip.
 
 ### `username`
 
-### `password`
+### `password` |`privateKeyPath`
 
-In order to connect your server.
+In order to connect your server. You can choose either `privateKeyPath` or `password`.
 
 ### `remotePath`
 
